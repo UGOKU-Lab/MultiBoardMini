@@ -3,7 +3,10 @@
 #include "MotorDriver.h"
 #include <PS3BT.h>
 #include <usbhub.h>
- 
+
+#define MAX_DUTY 0.25
+#define STICK_DEADBAND 500
+
 Serial pc(USBTX, USBRX, 115200);
 DigitalOut LED_0(PA_0);
 PwmOut LED_1(PA_6);
@@ -37,17 +40,17 @@ int Stick_vel_converter(int dead_band,int max_vel,int stick_input){
     return output_data;    
 }
 
-void single_stick_mode(){
+void motor_single_stick_mode(){
                  
     float x,y;
                  
     x = (float)PS3.getAnalogHat(RightHatX)/128-1;
     y = 1-(float)PS3.getAnalogHat(RightHatY)/128;
                 
-    m(x+y,y-x);
+    m(MAX_DUTY*(x+y),MAX_DUTY*(y-x));
 }
 
-void motor_double_stick_mode(float max_duty){
+void motor_double_stick_mode(){
     
     int stick_L,stick_R;
     double duty_L,duty_R;
@@ -59,8 +62,8 @@ void motor_double_stick_mode(float max_duty){
     stick_L = PS3.getAnalogHat(LeftHatY);
     stick_R = PS3.getAnalogHat(RightHatY);
     
-    duty_L = fabsf(((double)stick_L/255-0.5)*2*max_duty);
-    duty_R = fabsf(((double)stick_R/255-0.5)*2*max_duty);
+    duty_L = fabsf(((double)stick_L/255-0.5)*2*MAX_DUTY);
+    duty_R = fabsf(((double)stick_R/255-0.5)*2*MAX_DUTY);
     
     printf("%f %f\r\n",duty_L,duty_R);
     
@@ -100,7 +103,8 @@ int main(){
     while(1){
         Usb.Task();
         if (PS3.PS3Connected || PS3.PS3NavigationConnected) {
-            single_stick_mode();
+            //motor_single_stick_mode();
+            motor_double_stick_mode();
         }else{
             pc.printf("not connect\r\n");
         }
