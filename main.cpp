@@ -4,7 +4,7 @@
 #include <PS3BT.h>
 #include <usbhub.h>
 
-#define MAX_DUTY 0.25
+#define MAX_DUTY 1
 #define STICK_DEADBAND 500
 
 Serial pc(USBTX, USBRX, 115200);
@@ -15,6 +15,8 @@ PwmOut LED_1(PA_6);
 USB Usb(D11, D12, D13, A3, A2); // mosi, miso, sclk, ssel, intr
 BTD Btd(&Usb);
 PS3BT PS3(&Btd);
+
+int mode = 0;
 
 int Stick_vel_converter(int dead_band,int max_vel,int stick_input){    
     int dead_band_min;
@@ -103,8 +105,22 @@ int main(){
     while(1){
         Usb.Task();
         if (PS3.PS3Connected || PS3.PS3NavigationConnected) {
-            //motor_single_stick_mode();
-            motor_double_stick_mode();
+            
+            if(mode == 0){   
+            
+                if(PS3.getButtonClick(SELECT) == 1){
+                    mode = 1;
+                }else{
+                    motor_single_stick_mode();    
+                }
+            }else{
+                if(PS3.getButtonClick(SELECT) == 1){
+                    mode = 0;
+                }else{
+                    motor_double_stick_mode();
+                }
+            }
+
         }else{
             pc.printf("not connect\r\n");
         }
