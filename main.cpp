@@ -74,19 +74,19 @@ void motor_double_stick_mode(){
     //LED_1 = duty_R;
     
     if(stick_L >= 128){
-        A_IN1 = 1;
-        A_IN2 = 0;
-    }else{
         A_IN1 = 0;
         A_IN2 = 1;
+    }else{
+        A_IN1 = 1;
+        A_IN2 = 0;
     }
     
     if(stick_R >= 128){
-        B_IN1 = 1;
-        B_IN2 = 0;
-    }else{
         B_IN1 = 0;
         B_IN2 = 1;
+    }else{
+        B_IN1 = 1;
+        B_IN2 = 0;
     }
     
 }
